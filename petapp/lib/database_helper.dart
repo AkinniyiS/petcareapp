@@ -79,4 +79,75 @@ class DatabaseHelper{
       )
     ''');
   }
+    // CRUD Methods for Pet Profiles
+
+  // Insert a new pet profile
+  Future<int> insertPetProfile(Map<String, dynamic> row) async {
+    Database db = await instance.database;
+    return await db.insert(petProfileTable, row);
+  }
+
+  // Query all pet profiles
+  Future<List<Map<String, dynamic>>> queryAllPetProfiles() async {
+    Database db = await instance.database;
+    return await db.query(petProfileTable);
+  }
+
+  // Update a pet profile
+  Future<int> updatePetProfile(Map<String, dynamic> row) async {
+    Database db = await instance.database;
+    int id = row[columnPetId];
+    return await db.update(
+      petProfileTable,
+      row,
+      where: '$columnPetId = ?',
+      whereArgs: [id],
+    );
+  }
+
+  // Delete a pet profile
+  Future<int> deletePetProfile(int id) async {
+    Database db = await instance.database;
+    return await db.delete(
+      petProfileTable,
+      where: '$columnPetId = ?',
+      whereArgs: [id],
+    );
+  }
+
+  // CRUD Methods for Health Records
+
+  // Insert a new health record
+  Future<int> insertHealthRecord(Map<String, dynamic> row) async {
+    Database db = await instance.database;
+    return await db.insert(healthRecordsTable, row);
+  }
+
+  // Query all health records for a specific pet
+  Future<List<Map<String, dynamic>>> queryHealthRecords(int petId) async {
+    Database db = await instance.database;
+    return await db.query(
+      healthRecordsTable,
+      where: '$columnPetIdFK = ?',
+      whereArgs: [petId],
+    );
+  }
+
+  // CRUD Methods for Daily Care Tasks
+
+  // Insert a new care task
+  Future<int> insertDailyCareTask(Map<String, dynamic> row) async {
+    Database db = await instance.database;
+    return await db.insert(dailyCareTable, row);
+  }
+
+  // Query all daily care tasks for a specific pet
+  Future<List<Map<String, dynamic>>> queryDailyCareTasks(int petId) async {
+    Database db = await instance.database;
+    return await db.query(
+      dailyCareTable,
+      where: '$columnPetIdTaskFK = ?',
+      whereArgs: [petId],
+    );
+  }
 }
