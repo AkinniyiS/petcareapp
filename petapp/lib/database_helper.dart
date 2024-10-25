@@ -78,6 +78,14 @@ class DatabaseHelper{
       FOREIGN KEY ($columnPetIdTaskFK) REFERENCES $petProfileTable ($columnPetId)
       )
     ''');
+    // User Table
+    await db.execute('''
+      CREATE TABLE $userTable (
+      $columnUserId INTEGER PRIMARY KEY AUTOINCREMENT,
+      $columnUsername TEXT NOT NULL UNIQUE,
+      $columnPassword TEXT NOT NULL
+      )
+      '''); 
   }
     // CRUD Methods for Pet Profiles
 
@@ -114,6 +122,7 @@ class DatabaseHelper{
       whereArgs: [id],
     );
   }
+  
 
   // CRUD Methods for Health Records
 
@@ -150,4 +159,35 @@ class DatabaseHelper{
       whereArgs: [petId],
     );
   }
+// User Table information
+static final userTable = 'users';
+static final columnUserId = 'user_id';
+static final columnUsername = 'username';
+static final columnPassword = 'password';
+    
+// method for verifying user credentials
+Future<bool> verifyUser(String username, String password) async {
+  Database db = await instance.database;
+  var res = await db.query(userTable,
+      where: '$columnUsername = ? AND $columnPassword = ?',
+      whereArgs: [username, password]);
+  return res.isNotEmpty;
+}
+
+  // method to register a new user
+Future<int> registerUser(String username, String password) async {
+  Database db = await instance.database;
+
+  // Insert the new user record
+  try {
+    return await db.insert(userTable, {
+      columnUsername: username,
+      columnPassword: password,
+    });
+  } catch (e) {
+    // Return -1 if there's an error (e.g., username already exists)
+    return -1;
+  }
+}
+
 }
