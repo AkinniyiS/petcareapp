@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'database_helper.dart';
+import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -168,7 +169,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => LoginScreen(),
         '/register': (context) => SignupScreen(),
-        //'/home': (context) => HomeScreen(),   
+        '/home': (context) => HomeScreen(),   
       },
     );
   }
