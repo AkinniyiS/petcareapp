@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'profile_screen.dart';         
 import "settings.dart";
+import 'dailycare.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -56,7 +57,10 @@ class HomeScreen extends StatelessWidget {
               icon: Icon(Icons.task),
               label: Text('Daily Care Tasks'),
               onPressed: () {
-                Navigator.pushNamed(context, '/dailyCareTasks');
+                Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => DailyCareTaskScreen()),
+                );
               },
             ),
             Spacer(),

@@ -75,6 +75,7 @@ class DatabaseHelper{
       $columnTaskName TEXT NOT NULL,
       $columnTaskTime TEXT NOT NULL,
       $columnPetIdTaskFK INTEGER,
+      is_completed INTEGER DEFAULT 0,
       FOREIGN KEY ($columnPetIdTaskFK) REFERENCES $petProfileTable ($columnPetId)
       )
     ''');
@@ -162,6 +163,14 @@ class DatabaseHelper{
       whereArgs: [petId],
     );
   }
+  Future<int> deleteDailyCareTask(int id) async {
+  Database db = await instance.database;
+  return await db.delete(
+    dailyCareTable,
+    where: '$columnTaskId = ?',
+    whereArgs: [id],
+  );
+}
 // User Table information
 static final userTable = 'users';
 static final columnUserId = 'user_id';
