@@ -1,9 +1,12 @@
 
 import 'package:flutter/material.dart';
+import 'profile_screen.dart';
 import 'database_helper.dart'; 
 import 'main.dart';             
 
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,7 +35,10 @@ class HomeScreen extends StatelessWidget {
               icon: Icon(Icons.pets),
               label: Text('Manage Pet Profiles'),
               onPressed: () {
-                Navigator.pushNamed(context, '/petProfiles');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                );
               },
             ),
             SizedBox(height: 20),
