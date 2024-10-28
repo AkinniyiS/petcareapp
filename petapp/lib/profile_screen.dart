@@ -1,51 +1,94 @@
 import 'package:flutter/material.dart';
+import 'add_profile.dart';
+import 'database_helper.dart';
 
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+class PetProfileScreen extends StatefulWidget {
+  const PetProfileScreen({super.key});
 
   @override
+  ProfileScreen createState() => ProfileScreen();
+}
+
+class ProfileScreen extends State<PetProfileScreen> {
+
+  late List<Map<String, dynamic>> _petProfiles = []; // Store pet profiles here
+  @override
+  void initState() {
+    super.initState();
+    _loadPetProfiles();
+  }
+  void _loadPetProfiles() async {
+    // Load pet profiles from the database
+    final pets = await DatabaseHelper.instance.getPetProfiles();
+    setState(() {
+      _petProfiles = pets;
+    });
+  }
+
+  // Method to show a dialog with pet details
+  void _showPetDetails(Map<String, dynamic> petProfile) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(petProfile['name']),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Species: ${petProfile['species']}'),
+              Text('Breed: ${petProfile['breed']}'),
+              Text('Age: ${petProfile['age']}'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+ 
+   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pet Profiles'),
+        title: Text('Pet Profiles'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddPetProfileScreen(),
+                ),
+              ).then((_) {
+                // Reload the pet profiles when returning from the add screen
+                _loadPetProfiles();
+              });
+            },
+          ),
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Manage Your Pet Profiles',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              child: const Text('Add New Pet Profile'),
-              onPressed: () {
-                // Add navigation to a new screen for adding a pet profile
-              },
-            ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
-                itemCount: 1, 
-                itemBuilder: (context, index) {
-                  return Card(
-                    child: ListTile(
-                      title: Text('Pet ${index + 1}'),
-                      subtitle: Text('Pet Details Here'),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.edit),
-                        onPressed: () {
-                          // Navigate to edit pet profile screen
-                        },
-                      ),
-                    ),
-                  );
-                },
+      body: Expanded(
+        child: ListView.builder(
+          itemCount: _petProfiles.length,
+          itemBuilder: (context, index) {
+            final Map<String, dynamic> pet = _petProfiles[index];
+            return Card(
+              child: ListTile(
+                title: Text(pet['name']),
+                subtitle: Text('Species: ${pet['species']}'),
+                onTap: () => _showPetDetails(pet),
               ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );

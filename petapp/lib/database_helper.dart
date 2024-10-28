@@ -100,7 +100,10 @@ class DatabaseHelper{
     Database db = await instance.database;
     return await db.query(petProfileTable);
   }
-
+   // Get a pet profile by ID
+  Future<List<Map<String, dynamic>>> getPetProfiles() async {
+    return await queryAllPetProfiles();
+  }
   // Update a pet profile
   Future<int> updatePetProfile(Map<String, dynamic> row) async {
     Database db = await instance.database;
