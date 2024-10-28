@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'database_helper.dart'; // Make sure to import your database helper
 
 class AddPetProfileScreen extends StatefulWidget {
+  final Map<String, dynamic>? pet; // Accepting pet data for updates
+
+  const AddPetProfileScreen({Key? key, this.pet}) : super(key: key);
+
   @override
   _AddPetProfileScreenState createState() => _AddPetProfileScreenState();
 }
@@ -13,18 +17,38 @@ class _AddPetProfileScreenState extends State<AddPetProfileScreen> {
   final _breedController = TextEditingController();
   final _ageController = TextEditingController();
 
-  void _addPetProfile() async {
+  @override
+  void initState() {
+    super.initState();
+    if (widget.pet != null) {
+      // If pet data is provided, populate the fields
+      _nameController.text = widget.pet!['name'];
+      _speciesController.text = widget.pet!['species'];
+      _breedController.text = widget.pet!['breed'] ?? ''; // Handle potential null
+      _ageController.text = widget.pet!['age']?.toString() ?? ''; // Handle potential null
+    }
+  }
+
+  void _addOrUpdatePetProfile() async {
     if (_formKey.currentState!.validate()) {
-      // Create a new pet profile
-      await DatabaseHelper.instance.insertPetProfile({
+      final petProfile = {
         'name': _nameController.text,
         'species': _speciesController.text,
         'breed': _breedController.text,
         'age': int.tryParse(_ageController.text),
-      });
+      };
+
+      if (widget.pet == null) {
+        // Insert new pet profile
+        await DatabaseHelper.instance.insertPetProfile(petProfile);
+      } else {
+        // Update existing pet profile
+        petProfile['id'] = widget.pet!['id']; // Add ID for updating
+        await DatabaseHelper.instance.updatePetProfile(petProfile);
+      }
 
       // Go back to the previous screen
-      Navigator.pop(context);
+      Navigator.pop(context, true); // Return true to indicate an update
     }
   }
 
@@ -32,7 +56,7 @@ class _AddPetProfileScreenState extends State<AddPetProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Pet Profile'),
+        title: Text(widget.pet == null ? 'Add Pet Profile' : 'Edit Pet Profile'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -83,8 +107,8 @@ class _AddPetProfileScreenState extends State<AddPetProfileScreen> {
               ),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _addPetProfile,
-                child: Text('Add Pet Profile'),
+                onPressed: _addOrUpdatePetProfile,
+                child: Text(widget.pet == null ? 'Add Pet Profile' : 'Update Pet Profile'),
               ),
             ],
           ),

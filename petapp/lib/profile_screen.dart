@@ -26,33 +26,48 @@ class ProfileScreen extends State<PetProfileScreen> {
   }
 
   // Method to show a dialog with pet details
-  void _showPetDetails(Map<String, dynamic> petProfile) {
-    showDialog(
+ void _showPetDetails(Map<String, dynamic> pet) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => AddPetProfileScreen(pet: pet), // Pass pet data
+    ),
+  ).then((shouldReload) {
+    if (shouldReload != null && shouldReload) {
+      _loadPetProfiles(); // Reload profiles after updating
+    }
+  });
+}
+
+ Future<void> _deletePetProfile(int petId) async {
+    // Show confirmation dialog
+    final shouldDelete = await showDialog<bool>(
       context: context,
-      builder: (context) {
+      builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(petProfile['name']),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Species: ${petProfile['species']}'),
-              Text('Breed: ${petProfile['breed']}'),
-              Text('Age: ${petProfile['age']}'),
-            ],
-          ),
-          actions: [
+          title: Text('Delete Pet Profile'),
+          content: Text('Are you sure you want to delete this pet profile?'),
+          actions: <Widget>[
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Close'),
+              child: Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(false),
+            ),
+            TextButton(
+              child: Text('Delete'),
+              onPressed: () => Navigator.of(context).pop(true),
             ),
           ],
         );
       },
     );
+
+    // If user confirmed deletion, proceed to delete
+    if (shouldDelete == true) {
+      await DatabaseHelper.instance.deletePetProfile(petId);
+      _loadPetProfiles(); // Reload the profiles to reflect changes
+    }
   }
+
  
    @override
   Widget build(BuildContext context) {
@@ -60,8 +75,7 @@ class ProfileScreen extends State<PetProfileScreen> {
       appBar: AppBar(
         title: Text('Pet Profiles'),
         actions: [
-          IconButton(
-            icon: Icon(Icons.add),
+          TextButton(
             onPressed: () {
               Navigator.push(
                 context,
@@ -73,23 +87,33 @@ class ProfileScreen extends State<PetProfileScreen> {
                 _loadPetProfiles();
               });
             },
+            style: TextButton.styleFrom(
+            backgroundColor: Colors.grey, // Set background color to black
+      
+            ),
+            child: Text(
+              'Add Pet',
+              style: TextStyle(color: Colors.white), // Change text color to white for visibility
+            ),
           ),
         ],
       ),
-      body: Expanded(
-        child: ListView.builder(
-          itemCount: _petProfiles.length,
-          itemBuilder: (context, index) {
-            final Map<String, dynamic> pet = _petProfiles[index];
-            return Card(
-              child: ListTile(
-                title: Text(pet['name']),
-                subtitle: Text('Species: ${pet['species']}'),
-                onTap: () => _showPetDetails(pet),
+       body: ListView.builder(
+        itemCount: _petProfiles.length,
+        itemBuilder: (context, index) {
+          final Map<String, dynamic> pet = _petProfiles[index];
+          return Card(
+            child: ListTile(
+              title: Text(pet['name']),
+              subtitle: Text('Species: ${pet['species']}'),
+              onTap: () => _showPetDetails(pet),
+              trailing: IconButton(
+                icon: Icon(Icons.delete, color: Colors.red),
+                onPressed: () => _deletePetProfile(pet['id']),
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }
