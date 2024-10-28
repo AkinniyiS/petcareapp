@@ -1,8 +1,7 @@
 
 import 'package:flutter/material.dart';
-import 'profile_screen.dart';
-import 'database_helper.dart'; 
-import 'main.dart';             
+import 'profile_screen.dart';         
+import "settings.dart";
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -16,7 +15,10 @@ class HomeScreen extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: () {
-              Navigator.pushNamed(context, '/settings');  // Placeholder for settings route
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SettingsScreen()),
+              ); 
             },
           ),
         ],
