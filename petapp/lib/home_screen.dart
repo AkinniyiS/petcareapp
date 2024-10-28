@@ -1,4 +1,4 @@
-
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'profile_screen.dart';         
 import "settings.dart";
@@ -7,6 +7,21 @@ import 'healthrecord.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
+
+   void _launchMap() async {
+    //'https://www.google.com/maps/search/?api=1&query=animal+hospital'; 
+    var url = Uri(
+      scheme: 'https',
+      host: 'www.google.com',
+      path: '/maps/search/',
+      queryParameters: {'api': '1', 'query': 'animal+hospital'});
+      // https://example.com/page/?search=blue&limit=10
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +82,14 @@ class HomeScreen extends StatelessWidget {
                 );
               },
             ),
+             SizedBox(height: 20), // Added space between buttons
+            ElevatedButton.icon(
+              icon: Icon(Icons.local_hospital), // Hospital icon
+              label: Text('Find Nearest Animal Hospital'),
+              onPressed: _launchMap, // Call the function to open maps
+            ),
             Spacer(),
+            
             Center(
               child: ElevatedButton(
                 child: Text('Logout'),
