@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'profile_screen.dart';         
 import "settings.dart";
 import 'dailycare.dart';
+import 'healthrecord.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -49,7 +50,10 @@ class HomeScreen extends StatelessWidget {
               icon: Icon(Icons.health_and_safety),
               label: Text('View Health Records'),
               onPressed: () {
-                Navigator.pushNamed(context, '/healthRecords');
+                 Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HealthRecordsScreen()),
+                );
               },
             ),
             SizedBox(height: 20),

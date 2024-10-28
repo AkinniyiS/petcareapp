@@ -97,10 +97,10 @@ class DatabaseHelper{
   }
 
   // Query all pet profiles
-  Future<List<Map<String, dynamic>>> queryAllPetProfiles() async {
-    Database db = await instance.database;
-    return await db.query(petProfileTable);
-  }
+Future<List<Map<String, dynamic>>> queryAllPetProfiles() async {
+  final db = await database; // Your method to get the database
+  return await db.query('pet_profiles'); // Adjust based on your actual table name
+}
    // Get a pet profile by ID
   Future<List<Map<String, dynamic>>> getPetProfiles() async {
     return await queryAllPetProfiles();
@@ -145,6 +145,7 @@ class DatabaseHelper{
       whereArgs: [petId],
     );
   }
+  
 
   // CRUD Methods for Daily Care Tasks
 
