@@ -172,6 +172,17 @@ Future<List<Map<String, dynamic>>> queryAllPetProfiles() async {
     whereArgs: [id],
   );
 }
+  Future<void> updateTaskCompletion(int taskId, bool isCompleted) async {
+    // Assuming you're using a database like SQLite
+    final db = await database; // Your method to get the database instance
+
+    await db.update(
+      'tasks', // Table name
+      {'is_completed': isCompleted}, // Column and value to update
+      where: 'id = ?', // Where clause
+      whereArgs: [taskId], // Arguments for the where clause
+    );
+  }
 // User Table information
 static final userTable = 'users';
 static final columnUserId = 'user_id';

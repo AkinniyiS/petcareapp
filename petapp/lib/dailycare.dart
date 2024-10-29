@@ -10,7 +10,7 @@ class _DailyCareTaskScreenState extends State<DailyCareTaskScreen> {
   final _taskNameController = TextEditingController();
   final _taskTimeController = TextEditingController();
   List<Map<String, dynamic>> _tasks = [];
-  
+
   @override
   void initState() {
     super.initState();
@@ -27,7 +27,7 @@ class _DailyCareTaskScreenState extends State<DailyCareTaskScreen> {
   void _addTask() async {
     final taskName = _taskNameController.text;
     final taskTime = _taskTimeController.text;
-    
+
     if (taskName.isNotEmpty && taskTime.isNotEmpty) {
       await DatabaseHelper.instance.insertDailyCareTask({
         'task_name': taskName,
@@ -45,34 +45,53 @@ class _DailyCareTaskScreenState extends State<DailyCareTaskScreen> {
     _loadTasks();
   }
 
-  void _toggleTaskCompletion(int id, bool isChecked) async {
-    // Optionally update the task completion status
-    // This requires updating the database schema to include a completion status
-    // You can define a new column `is_completed` in the daily care tasks table
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Daily Care Tasks'),
+        backgroundColor: const Color.fromARGB(255, 230, 172, 240),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
               controller: _taskNameController,
-              decoration: InputDecoration(labelText: 'Add a Task'),
+              decoration: InputDecoration(
+                labelText: 'Add a Task',
+                filled: true,
+                fillColor: Colors.purple[50],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+              ),
             ),
             SizedBox(height: 10),
             TextField(
               controller: _taskTimeController,
-              decoration: InputDecoration(labelText: 'Task Time (e.g., 8:00 AM)'),
+              decoration: InputDecoration(
+                labelText: 'Task Time (e.g., 8:00 AM)',
+                filled: true,
+                fillColor: Colors.purple[50],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+              ),
             ),
             SizedBox(height: 10),
             ElevatedButton(
               onPressed: _addTask,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 197, 136, 207),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              ),
               child: Text('Add Task'),
             ),
             SizedBox(height: 20),
@@ -81,26 +100,42 @@ class _DailyCareTaskScreenState extends State<DailyCareTaskScreen> {
                 itemCount: _tasks.length,
                 itemBuilder: (context, index) {
                   final task = _tasks[index];
+                  bool isChecked = task['is_completed'] ?? false;
+
                   return Card(
+                    color: isChecked ? Colors.grey[300] : Colors.white, // Gray out the card if checked
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    margin: const EdgeInsets.symmetric(vertical: 8),
                     child: ListTile(
-                      title: Text(task['task_name']+ " "+task['task_time']),
+                      title: Text(
+                        '${task['task_name']} at ${task['task_time']}',
+                        style: TextStyle(
+                          color: isChecked ? Colors.grey[600] : Colors.black, // Change text color if checked
+                          decoration: isChecked ? TextDecoration.lineThrough : null, // Strikethrough if checked
+                        ),
+                      ),
                       trailing: IconButton(
-                        icon: Icon(Icons.delete),
+                        icon: Icon(Icons.delete, color: Colors.redAccent),
                         onPressed: () {
                           _deleteTask(task['id']);
                         },
                       ),
                       leading: Checkbox(
-                        value: task['is_completed'] ?? false,
+                        value: isChecked,
                         onChanged: (value) {
                           setState(() {
-                            _toggleTaskCompletion(task['id'], value!);
+                            // Simulate checking or unchecking without updating database
+                            if (value != null) {
+                              task['is_completed'] = value; // Update the local task status
+                            }
                           });
                         },
-                        activeColor: Colors.green, 
-                        checkColor: Colors.green,
+                        activeColor: Colors.green,
+                        checkColor: Colors.white,
                       ),
-                    )
+                    ),
                   );
                 },
               ),

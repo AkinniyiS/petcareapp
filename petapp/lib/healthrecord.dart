@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'database_helper.dart'; // Import your database helper
-import 'addhealthrecord.dart'; // Import the screen to add health records
+import 'database_helper.dart';
+import 'addhealthrecord.dart';
 
 class HealthRecordsScreen extends StatefulWidget {
   @override
@@ -9,18 +9,18 @@ class HealthRecordsScreen extends StatefulWidget {
 
 class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
   List<Map<String, dynamic>> _pets = [];
-  int? _selectedPetId; // Store the selected pet ID
+  int? _selectedPetId;
   List<Map<String, dynamic>> _healthRecords = [];
-  String? _selectedPetName; // Store the selected pet name
+  String? _selectedPetName;
 
   @override
   void initState() {
     super.initState();
-    _loadPets(); // Load pets on initialization
+    _loadPets();
   }
 
   void _loadPets() async {
-    final pets = await DatabaseHelper.instance.queryAllPetProfiles(); // Load all pet profiles
+    final pets = await DatabaseHelper.instance.queryAllPetProfiles();
     setState(() {
       _pets = pets;
     });
@@ -31,7 +31,6 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
       final records = await DatabaseHelper.instance.queryHealthRecords(_selectedPetId!);
       setState(() {
         _healthRecords = records;
-        // Update the selected pet name based on the selected ID
         _selectedPetName = _pets.firstWhere((pet) => pet['id'] == _selectedPetId)['name'];
       });
     }
@@ -45,8 +44,6 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
           builder: (context) => AddHealthRecordScreen(petId: _selectedPetId!),
         ),
       );
-
-      // Reload health records after adding a new record
       _loadHealthRecords();
     }
   }
@@ -56,38 +53,62 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Health Records'),
+        backgroundColor: Colors.redAccent,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            DropdownButton<int>(
-              hint: Text('Select a pet'),
+            DropdownButtonFormField<int>(
+              decoration: InputDecoration(
+                labelText: 'Select a pet',
+                labelStyle: TextStyle(color: Colors.redAccent),
+                filled: true,
+                fillColor: Colors.red[50],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+              ),
               value: _selectedPetId,
               onChanged: (int? newPetId) {
                 setState(() {
-                  _selectedPetId = newPetId; // Store the selected pet ID
-                  _loadHealthRecords(); // Load health records for the selected pet
+                  _selectedPetId = newPetId;
+                  _loadHealthRecords();
                 });
               },
               items: _pets.map((pet) {
                 return DropdownMenuItem<int>(
-                  value: pet['id'], // Set the ID as the value
+                  value: pet['id'],
                   child: Text(pet['name']),
                 );
               }).toList(),
             ),
             SizedBox(height: 20),
-            if (_selectedPetId != null && _selectedPetName != null) // Show pet info only if a pet is selected
+            if (_selectedPetId != null && _selectedPetName != null)
               Text(
-                'Health Records for: $_selectedPetName', // Show the pet's name instead of ID
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                'Health Records for: $_selectedPetName',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.redAccent,
+                ),
               ),
             SizedBox(height: 20),
-            if (_selectedPetId != null) // Show the button only if a pet is selected
-              ElevatedButton(
-                onPressed: _navigateToAddRecord,
-                child: Text('Add Health Record'),
+            if (_selectedPetId != null)
+              Center(
+                child: ElevatedButton(
+                  onPressed: _navigateToAddRecord,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.redAccent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  ),
+                  child: Text('Add Health Record'),
+                ),
               ),
             SizedBox(height: 20),
             Expanded(
@@ -96,9 +117,20 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
                 itemBuilder: (context, index) {
                   final record = _healthRecords[index];
                   return Card(
+                    color: Colors.red[50],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    margin: const EdgeInsets.symmetric(vertical: 8),
                     child: ListTile(
-                      title: Text('Vaccination Date: ${record['vaccination_date']}'),
-                      subtitle: Text('Details: ${record['record_details']}'),
+                      title: Text(
+                        'Vaccination Date: ${record['vaccination_date']}',
+                        style: TextStyle(color: Colors.redAccent[700]),
+                      ),
+                      subtitle: Text(
+                        'Details: ${record['record_details']}',
+                        style: TextStyle(color: Colors.redAccent[300]),
+                      ),
                     ),
                   );
                 },
